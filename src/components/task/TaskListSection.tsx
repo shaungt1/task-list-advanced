@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { Task } from '../types/task';
+// import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import { Task } from '../../types/task';
 import { TaskList } from './TaskList';
 import { TaskListSelector } from './TaskListSelector';
-import { AITaskGenerator } from './AITaskGenerator';
-import { getExampleLists } from '../services/taskListService';
+import { AITaskGenerator } from '../ai/AITaskGenerator';
+import { getExampleLists } from '../../services/taskListService';
+import React from 'react';
 
 interface TaskListSectionProps {
   tasks: Task[];

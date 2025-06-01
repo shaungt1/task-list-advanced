@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { importAllExampleLists } from '../../services/taskListService';
+import { importAllExampleLists } from '../services/taskListService';
 
 interface ImportExamplesButtonProps {
   onSuccess: () => void;

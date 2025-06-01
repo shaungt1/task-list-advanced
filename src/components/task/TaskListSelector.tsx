@@ -1,5 +1,5 @@
-import React from 'react';
-import { Task } from '../types/task';
+// import React from 'react';
+import { Task } from '../../types/task';
 
 interface TaskListSelectorProps {
   exampleLists: { name: string; data: Task[] }[];

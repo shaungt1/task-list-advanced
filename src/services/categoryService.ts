@@ -48,7 +48,11 @@ export async function getCategories(): Promise<Category[]> {
       return DEFAULT_CATEGORIES;
     }
 
-    return data || DEFAULT_CATEGORIES;
+    // Ensure description is always a string
+    return (data?.map(cat => ({
+      ...cat,
+      description: cat.description ?? ""
+    })) || DEFAULT_CATEGORIES);
   } catch (error) {
     console.error('Error in getCategories:', error);
     return DEFAULT_CATEGORIES;
@@ -61,7 +65,7 @@ export async function createCategory(name: string, description?: string): Promis
       const newCategory = {
         id: crypto.randomUUID(),
         name: name.toLowerCase(),
-        description,
+        description: description ?? "",
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -132,7 +136,7 @@ export async function getTaskListCategories(taskListId: string): Promise<string[
       return [];
     }
 
-    return data.map(row => row.categories.name);
+    return data.flatMap(row => row.categories.map((cat: { name: string }) => cat.name));
   } catch (error) {
     console.error('Error in getTaskListCategories:', error);
     return [];

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { PlusCircle, Code, Heading, AlignLeft } from 'lucide-react';
-import { RichTextEditor } from './RichTextEditor';
-import { CodeBlockEditor } from './code/CodeBlockEditor';
+import { RichTextEditor } from '../RichTextEditor';
+import { CodeBlockEditor } from '../code/CodeBlockEditor';
 
 interface TaskInputProps {
   onAddTask: (

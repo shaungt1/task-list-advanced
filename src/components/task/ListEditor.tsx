@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Save } from 'lucide-react';
-import { TaskInput } from '../TaskInput';
-import { TaskList } from '../TaskList';
+import { TaskInput } from './TaskInput';
+import { TaskList } from './TaskList';
 import { Task } from '../../types/task';
 import { saveTaskList } from '../../services/taskListService';
 

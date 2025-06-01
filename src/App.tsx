@@ -1,47 +1,16 @@
 import { useState, useEffect } from 'react';
-import { HelpCircle } from 'lucide-react';
-import { useSettings } from './hooks/useSettings';
-import { useTasks } from './hooks/useTasks';
+import { ThemeProvider } from './utils/ThemeContext';
 import { useAuth } from './hooks/useAuth';
-import { Header } from './components/layout/Header';
-import { TaskInput } from './components/TaskInput';
-import { TaskListSection } from './components/TaskListSection';
-import { Footer } from './components/layout/Footer';
-import { ConfirmationModal } from './components/modals/ConfirmationModal';
-import { SettingsModal } from './components/modals/SettingsModal';
-import { HelpModal } from './components/modals/HelpModal';
-import { ErrorNotification } from './components/notifications/ErrorNotification';
-import { IntroModal } from './components/modals/IntroModal';
-import { Tour } from './components/tour/Tour';
-import { AuthModal } from './components/auth/AuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
+import { MainView } from './components/MainView';
+import { Task } from './types/task';
 import { supabase } from './lib/supabase';
 
 export default function App() {
-  const [settings, setSettings] = useSettings();
-  const { user, loading: authLoading, isAdmin } = useAuth();
-  const {
-    tasks,
-    setTasks,
-    addTask,
-    duplicateTask,
-    toggleTask,
-    deleteTask,
-    editTask,
-    reorderTasks
-  } = useTasks();
-
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showHelpModal, setShowHelpModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isAdmin, user, loading: authLoading } = useAuth();
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [isFirstUser, setIsFirstUser] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showTour, setShowTour] = useState(() => {
-    const hasSeenTour = sessionStorage.getItem('hasSeenTour');
-    return !hasSeenTour && !settings.googleApiKey;
-  });
 
   useEffect(() => {
     // Check if this is the first user
@@ -70,139 +39,22 @@ export default function App() {
     }
   }, [authLoading]);
 
-  const handleLogoClick = () => {
-    if (tasks.length > 0) {
-      setShowConfirmationModal(true);
-    } else {
-      window.location.reload();
-    }
-  };
-
-  const handleConfirmReload = () => {
-    window.location.reload();
-  };
-
-  const handleSettingsSave = (newSettings: typeof settings) => {
-    setSettings(newSettings);
-    setShowSettingsModal(false);
-  };
-
-  const handleTourComplete = () => {
-    sessionStorage.setItem('hasSeenTour', 'true');
-    setShowTour(false);
-  };
-
-  const checkAllSubTasks = (headlineId: string) => {
-    setTasks((prevTasks) => {
-      const isAllCompleted = prevTasks.every(task => 
-        task.isHeadline || task.completed || !isSubTaskOf(task, headlineId, prevTasks)
-      );
-      
-      return prevTasks.map(task => {
-        if (task.id === headlineId || isSubTaskOf(task, headlineId, prevTasks)) {
-          return { ...task, completed: !isAllCompleted };
-        }
-        return task;
-      });
-    });
-  };
-
-  const isSubTaskOf = (task: Task, headlineId: string, tasks: Task[]) => {
-    if (task.isHeadline) return false;
-    const taskIndex = tasks.findIndex(t => t.id === task.id);
-    for (let i = taskIndex; i >= 0; i--) {
-      if (tasks[i].isHeadline) {
-        return tasks[i].id === headlineId;
-      }
-    }
-    return false;
-  };
-
   if (showAdminDashboard && isAdmin) {
     return (
-      <AdminDashboard 
-        onClose={() => setShowAdminDashboard(false)}
-        onError={setError}
-        onEditList={(list) => {
-          setTasks(list.data);
-          setShowAdminDashboard(false);
-        }}
-      />
+      <ThemeProvider>
+        <AdminDashboard
+          onClose={() => setShowAdminDashboard(false)}
+          onError={setError}
+          onEditList={(list: { data: Task[] }) => {
+            setShowAdminDashboard(false);
+          }}
+        />
+      </ThemeProvider>
     );
   }
-
   return (
-    <div className="min-h-screen bg-gray-50 relative">
-      <div className="absolute top-4 left-4 flex items-center gap-2">
-        <span className="beta-badge">beta</span>
-      </div>
-      {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
-
-      <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 mb-8">
-          <Header
-            onLogoClick={handleLogoClick}
-            onSettingsClick={() => setShowSettingsModal(true)}
-            onAdminClick={() => setShowAdminDashboard(true)}
-            tasks={tasks}
-            onImport={setTasks}
-            isAdmin={isAdmin}
-          />
-          <TaskInput onAddTask={addTask} />
-        </div>
-        <TaskListSection
-          tasks={tasks}
-          onToggle={toggleTask}
-          onDelete={deleteTask}
-          onEdit={editTask}
-          onDuplicate={duplicateTask}
-          onReorder={reorderTasks}
-          onCheckAllSubTasks={checkAllSubTasks}
-          onImportTaskList={setTasks}
-          googleApiKey={settings.googleApiKey}
-          onError={setError}
-          isAdmin={isAdmin}
-        />
-      </div>
-
-      <Footer />
-      <button
-        onClick={() => setShowHelpModal(true)}
-        className="fixed bottom-4 right-4 p-2 text-gray-400 hover:text-gray-600"
-        title="Help"
-      >
-        <HelpCircle size={24} />
-      </button>
-
-      {showConfirmationModal && (
-        <ConfirmationModal
-          onConfirm={handleConfirmReload}
-          onCancel={() => setShowConfirmationModal(false)}
-          tasks={tasks}
-        />
-      )}
-      {showSettingsModal && (
-        <SettingsModal
-          onClose={() => setShowSettingsModal(false)}
-          onSave={handleSettingsSave}
-          initialSettings={settings}
-          isAdmin={isAdmin}
-          user={user}
-          onShowAuth={() => setShowAuthModal(true)}
-        />
-      )}
-      {showHelpModal && (
-        <HelpModal onClose={() => setShowHelpModal(false)} />
-      )}
-      {showTour && (
-        <Tour onComplete={handleTourComplete} />
-      )}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          isFirstUser={isFirstUser}
-        />
-      )}
-    </div>
+    <ThemeProvider>
+      <MainView />
+    </ThemeProvider>
   );
 }

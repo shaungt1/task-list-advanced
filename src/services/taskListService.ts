@@ -2,12 +2,12 @@ import { supabase } from '../lib/supabase';
 import { Task } from '../types/task';
 
 export interface TaskList {
-  id: string;
+  id: string | any;
   name: string;
   data: Task[];
   created_at: string;
   user_id: string | null;
-  is_example?: boolean;
+  is_example: boolean;
 }
 
 export async function saveTaskList(name: string, tasks: Task[], isExample = false) {
@@ -129,7 +129,7 @@ async function fetchLocalExampleLists() {
     );
 
     // Filter out any failed loads
-    return lists.filter((list): list is TaskList => list !== null);
+    return lists.filter((list): list is NonNullable<typeof list> => list !== null);
   } catch (error) {
     console.error('Error loading local example lists:', error);
     return [];
@@ -182,7 +182,7 @@ export async function importAllExampleLists() {
   }
 
   return results
-    .filter((result): result is PromiseFullfilledResult<TaskList> => 
+    .filter((result): result is PromiseFulfilledResult<TaskList> => 
       result.status === 'fulfilled'
     )
     .map(result => result.value);
