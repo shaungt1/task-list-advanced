@@ -123,8 +123,8 @@ export function MainView() {
 
   // NavBar with dark mode toggle
   return (
-    <div className={`flex flex-col min-h-screen bg-zinc-50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 transition-colors duration-300`}>
-      <nav className="w-full flex items-center justify-between px-4 py-3 bg-zinc-100 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-800">
+    <div className={`flex flex-col min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-zinc-900 text-zinc-50' : 'bg-zinc-50 text-zinc-900'}`}>
+      <nav className={`w-full flex items-center justify-between px-4 py-3 border-b transition-colors ${theme === 'dark' ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
         <div className="flex items-center gap-2">
           <span className="font-bold tracking-wide text-lg">Task List</span>
           <span className="beta-badge ml-2">ASTRO</span>
@@ -134,7 +134,7 @@ export function MainView() {
           <button
             id="theme-toggle"
             onClick={toggleTheme}
-            className="p-2 rounded bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors"
+            className={`p-2 rounded transition-colors ${theme === 'dark' ? 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'}`}
             aria-label="Toggle dark mode"
           >
             {theme === 'dark' ? '🌙' : '☀️'}

@@ -23,16 +23,22 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<'light' | 'dark'>(getInitialTheme());
 
   useEffect(() => {
+    console.log('[ThemeContext] useEffect: theme changed to', theme);
     localStorage.setItem('theme', theme);
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
+
   }, [theme]);
 
-  const setTheme = (t: 'light' | 'dark') => setThemeState(t);
-  const toggleTheme = () => setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  const setTheme = (t: 'light' | 'dark') => {
+  console.log('[ThemeContext] setTheme called:', t);
+  setThemeState(t);
+};
+  const toggleTheme = () => {
+  setThemeState((prev) => {
+    const next = prev === 'dark' ? 'light' : 'dark';
+    console.log('[ThemeContext] toggleTheme called. Next theme:', next);
+    return next;
+  });
+};
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>

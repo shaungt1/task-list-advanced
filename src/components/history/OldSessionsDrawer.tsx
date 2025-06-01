@@ -1,7 +1,7 @@
 import React from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "../ui/sheet";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "../ui/accordion";
+import { Button } from "../ui/button";
 import { format, parseISO } from "date-fns";
 import { History, ArrowRight } from "lucide-react";
 
@@ -81,7 +81,7 @@ export const OldSessionsDrawer: React.FC<OldSessionsDrawerProps> = ({
                           className="accent-purple-600"
                         />
                         <span className="font-semibold text-zinc-800 dark:text-zinc-100">{list.name}</span>
-                        <Button size="xs" variant="ghost" className="ml-auto" onClick={() => onImportListsToToday([list.id])}>
+                        <Button size="sm" variant="ghost" className="ml-auto" onClick={() => onImportListsToToday([list.id])}>
                           <ArrowRight size={16} className="mr-1" /> Bring List
                         </Button>
                       </div>
@@ -95,7 +95,7 @@ export const OldSessionsDrawer: React.FC<OldSessionsDrawerProps> = ({
                               className="accent-purple-600"
                             />
                             <span className={`text-sm ${task.completed ? 'line-through text-zinc-400' : ''}`}>{task.content}</span>
-                            <Button size="xs" variant="ghost" onClick={() => onImportTasksToToday([task.id])}>
+                            <Button size="sm" variant="ghost" onClick={() => onImportTasksToToday([task.id])}>
                               <ArrowRight size={14} className="mr-1" /> Bring Task
                             </Button>
                           </li>

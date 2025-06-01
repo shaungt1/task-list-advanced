@@ -12,8 +12,11 @@ interface HeaderProps {
   isAdmin?: boolean;
 }
 
+import { useTheme } from '../../utils/ThemeContext';
+
 export function Header({ onLogoClick, onSettingsClick, onAdminClick, tasks, onImport, isAdmin }: HeaderProps) {
   const [showExportModal, setShowExportModal] = useState(false);
+  const { theme } = useTheme();
 
   const handleExport = (name: string) => {
     const dataStr = JSON.stringify({ name, data: tasks }, null, 2);
@@ -57,13 +60,13 @@ export function Header({ onLogoClick, onSettingsClick, onAdminClick, tasks, onIm
     <div className="flex items-center justify-between mb-4 sm:mb-8">
       <div className="flex items-center gap-3 cursor-pointer" onClick={onLogoClick}>
         <CheckSquare size={32} className="text-blue-500" />
-        <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Task List Advanced</h1>
+        <h1 className={`text-xl sm:text-2xl font-semibold ${theme === 'dark' ? 'text-zinc-100' : 'text-zinc-900'}`}>Task List Advanced</h1>
       </div>
       <div className="flex items-center gap-2">
         <div className="import-export-buttons flex gap-2">
           <button
             onClick={() => setShowExportModal(true)}
-            className="import-export-button flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="import-export-button flex items-center gap-2 px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
             title="Export tasks"
           >
             <Download size={16} />
@@ -71,7 +74,7 @@ export function Header({ onLogoClick, onSettingsClick, onAdminClick, tasks, onIm
           </button>
           <button
             onClick={handleImport}
-            className="import-export-button flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="import-export-button flex items-center gap-2 px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
             title="Import tasks"
           >
             <Upload size={16} />
@@ -81,7 +84,7 @@ export function Header({ onLogoClick, onSettingsClick, onAdminClick, tasks, onIm
         {isAdmin && (
           <button
             onClick={onAdminClick}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
             title="Admin Dashboard"
           >
             <Shield size={16} />
@@ -90,7 +93,7 @@ export function Header({ onLogoClick, onSettingsClick, onAdminClick, tasks, onIm
         )}
         <button
           onClick={onSettingsClick}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-zinc-400 hover:text-zinc-600"
           title="Settings"
         >
           <Settings size={18} />
