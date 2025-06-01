@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Send, Paperclip } from 'lucide-react';
 import { generateTasks } from '../services/aiService';
 import { ChatMessage } from '../types/chat';

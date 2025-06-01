@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, ArrowRight, ArrowLeft } from 'lucide-react';
-import { WelcomeImage } from './intro/WelcomeImage';
-import { TaskCreationImage } from './intro/TaskCreationImage';
-import { RichContentImage } from './intro/RichContentImage';
-import { AIGenerationImage } from './intro/AIGenerationImage';
-import { ImportExportImage } from './intro/ImportExportImage';
+import { WelcomeImage } from '../intro/WelcomeImage';
+import { TaskCreationImage } from '../intro/TaskCreationImage';
+import { RichContentImage } from '../intro/RichContentImage';
+import { AIGenerationImage } from '../intro/AIGenerationImage';
+import { ImportExportImage } from '../intro/ImportExportImage';
 
 interface IntroModalProps {
   onClose: () => void;

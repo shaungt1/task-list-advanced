@@ -3,6 +3,7 @@ import React from 'react';
 interface CodeBlockEditorProps {
   code: string;
   onChange: (code: string) => void;
+  language?: string; 
 }
 
 export function CodeBlockEditor({ code, onChange }: CodeBlockEditorProps) {

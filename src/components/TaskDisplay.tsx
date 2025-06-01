@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Check, Trash2, Edit2, CheckSquare, AlignLeft, Copy } from 'lucide-react';
 import { Task } from '../types/task';
 import { CodeBlock } from './code/CodeBlock';
 import { TaskText } from './TaskText';
-import { DescriptionModal } from './DescriptionModal';
+import { DescriptionModal } from './modals/DescriptionModal';
 
 interface TaskDisplayProps {
   task: Task;

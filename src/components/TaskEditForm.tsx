@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, Save, Code, AlignLeft, Heading } from 'lucide-react';
 import { Task } from '../types/task';
 import { CodeBlockEditor } from './code/CodeBlockEditor';

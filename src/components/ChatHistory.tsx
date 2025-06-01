@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Download, ChevronRight, Trash2, X } from 'lucide-react';
 import { ChatMessage } from '../types/chat';
 
@@ -149,10 +149,10 @@ export function ChatHistory({ onClose }: ChatHistoryProps) {
                       {content}
                     </p>
                   )}
-                  {message.attachments?.length > 0 && (
+                  {(message.attachments ?? []).length > 0 && (
                     <div className="mt-2">
                       <span className="text-xs text-gray-500">
-                        Attachments: {message.attachments.join(', ')}
+                        Attachments: {(message.attachments ?? []).join(', ')}
                       </span>
                     </div>
                   )}

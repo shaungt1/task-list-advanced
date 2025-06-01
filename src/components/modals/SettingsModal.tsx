@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, ExternalLink, LogIn, LogOut } from 'lucide-react';
-import { ChatHistory } from './ChatHistory';
-import { ImportExamplesButton } from './admin/ImportExamplesButton';
+import { ChatHistory } from '../ChatHistory';
+import { ImportExamplesButton } from '../admin/ImportExamplesButton';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../../lib/supabase';
 
 interface SettingsModalProps {
   onClose: () => void;

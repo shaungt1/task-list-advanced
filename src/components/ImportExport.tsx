@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Download, Upload } from 'lucide-react';
 import { Task } from '../types/task';
 import { exportTasks } from '../utils/storage';
-import { ImportModal } from './ImportModal';
+import { ImportModal } from './modals/ImportModal';
 
 interface ImportExportProps {
   tasks: Task[];

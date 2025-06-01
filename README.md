@@ -1,6 +1,6 @@
 # Task List Advanced
 
-A modern task management application with code block support and AI task generation capabilities. Built with React, TypeScript, and Tailwind CSS.
+A modern task management application with code block support and AI task generation capabilities. Built with TypeScript, and Tailwind CSS.
 
 ## Features
 

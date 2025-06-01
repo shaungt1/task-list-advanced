@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { CheckSquare, Settings, Shield, Download, Upload } from 'lucide-react';
-import { Task } from '../types/task';
-import { ExportModal } from './ExportModal';
+import { Task } from '../../types/task';
+import { ExportModal } from '../modals/ExportModal';
 
 interface HeaderProps {
   onLogoClick: () => void;

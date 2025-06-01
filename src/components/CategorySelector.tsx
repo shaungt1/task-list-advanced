@@ -1,15 +1,26 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Tag, X } from 'lucide-react';
 
+// Props interface for the CategorySelector component
 interface CategorySelectorProps {
-  selectedCategories: string[];
-  onUpdateCategories: (categories: string[]) => void;
+  selectedCategories: string[]; // Array of currently selected categories
+  onUpdateCategories: (categories: string[]) => void; // Callback to update selected categories
 }
 
+/**
+ * CategorySelector Component
+ * 
+ * This component allows users to select, add, and manage categories for tasks.
+ * It provides a UI for toggling existing categories, adding new ones, and displaying selected categories.
+ */
 export function CategorySelector({ selectedCategories, onUpdateCategories }: CategorySelectorProps) {
+  // State to manage whether the category selection dropdown is open
   const [isOpen, setIsOpen] = useState(false);
+
+  // State to manage the input value for adding a new category
   const [newCategory, setNewCategory] = useState('');
 
+  // Predefined list of available categories
   const availableCategories = [
     'installation',
     'deployment',
@@ -21,6 +32,11 @@ export function CategorySelector({ selectedCategories, onUpdateCategories }: Cat
     'guide'
   ];
 
+  /**
+   * Toggles the selection of a category.
+   * If the category is already selected, it removes it; otherwise, it adds it.
+   * @param category - The category to toggle
+   */
   const toggleCategory = (category: string) => {
     if (selectedCategories.includes(category)) {
       onUpdateCategories(selectedCategories.filter(c => c !== category));
@@ -29,6 +45,10 @@ export function CategorySelector({ selectedCategories, onUpdateCategories }: Cat
     }
   };
 
+  /**
+   * Adds a new category to the selected categories list.
+   * Converts the input to lowercase and clears the input field.
+   */
   const handleAddCategory = () => {
     if (newCategory.trim()) {
       onUpdateCategories([...selectedCategories, newCategory.trim().toLowerCase()]);
@@ -38,6 +58,7 @@ export function CategorySelector({ selectedCategories, onUpdateCategories }: Cat
 
   return (
     <div className="space-y-2">
+      {/* Display selected categories */}
       <div className="flex flex-wrap gap-2">
         {selectedCategories.map(category => (
           <div
@@ -53,6 +74,7 @@ export function CategorySelector({ selectedCategories, onUpdateCategories }: Cat
             </button>
           </div>
         ))}
+        {/* Button to toggle the dropdown for adding/editing categories */}
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center gap-1 px-2 py-1 text-gray-600 hover:text-gray-900 rounded-full text-sm border border-gray-200 hover:border-gray-300"
@@ -62,8 +84,10 @@ export function CategorySelector({ selectedCategories, onUpdateCategories }: Cat
         </button>
       </div>
 
+      {/* Dropdown for adding new categories and toggling predefined ones */}
       {isOpen && (
         <div className="p-4 bg-white border rounded-lg shadow-sm">
+          {/* Input for adding a new category */}
           <div className="mb-4">
             <div className="flex gap-2">
               <input
@@ -89,6 +113,7 @@ export function CategorySelector({ selectedCategories, onUpdateCategories }: Cat
             </div>
           </div>
 
+          {/* List of predefined categories with checkboxes */}
           <div className="grid grid-cols-2 gap-2">
             {availableCategories.map(category => (
               <label
