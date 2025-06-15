@@ -5,6 +5,8 @@ import { useTasks } from '../hooks/useTasks';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../utils/ThemeContext';
 import { Header } from './layout/Header';
+import { SidebarV2 } from './layout/SidebarV2';
+import { HeaderNav } from './layout/HeaderNav';
 import { TaskInput } from './task/TaskInput';
 import { TaskListSection } from './task/TaskListSection';
 import { Footer } from './layout/Footer';
@@ -18,6 +20,27 @@ import { supabase } from '../lib/supabase';
 import { Task } from '../types/task';
 
 export function MainView() {
+  // Sidebar and navigation state
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpenHistory, setSidebarOpenHistory] = useState(false);
+  const [selectedNav, setSelectedNav] = useState<'dashboard' | 'history' | 'settings'>('dashboard');
+  // Category/list state (stubbed for now)
+  const [categories, setCategories] = useState([]); // TODO: Wire to real data
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [days, setDays] = useState([]); // TODO: Wire to real data
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Keyboard shortcut for sidebar collapse (Ctrl/Cmd+B)
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        setSidebarCollapsed((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
   const [settings, setSettings] = useSettings();
   const { user, loading: authLoading, isAdmin } = useAuth();
   const {
@@ -121,92 +144,128 @@ export function MainView() {
 
   // --- Remove old dark mode toggle logic ---
 
-  // NavBar with dark mode toggle
+    // Main layout with SidebarV2 and HeaderNav
   return (
     <div className={`flex flex-col min-h-screen transition-colors duration-300 ${theme === 'dark' ? 'bg-zinc-900 text-zinc-50' : 'bg-zinc-50 text-zinc-900'}`}>
-      <nav className={`w-full flex items-center justify-between px-4 py-3 border-b transition-colors ${theme === 'dark' ? 'bg-zinc-900 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
-        <div className="flex items-center gap-2">
-          <span className="font-bold tracking-wide text-lg">Task List</span>
-          <span className="beta-badge ml-2">ASTRO</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <label htmlFor="theme-toggle" className="text-sm mr-2">Dark Mode</label>
-          <button
-            id="theme-toggle"
-            onClick={toggleTheme}
-            className={`p-2 rounded transition-colors ${theme === 'dark' ? 'bg-zinc-800 text-zinc-200 hover:bg-zinc-700' : 'bg-zinc-200 text-zinc-700 hover:bg-zinc-300'}`}
-            aria-label="Toggle dark mode"
-          >
-            {theme === 'dark' ? '🌙' : '☀️'}
-          </button>
-        </div>
-      </nav>
-      {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
-      <div className="flex-grow flex flex-col">
-        <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 lg:px-8 w-full flex-grow">
-          <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 mb-8 transition-colors">
-            <Header
-              onLogoClick={handleLogoClick}
-              onSettingsClick={() => setShowSettingsModal(true)}
-              onAdminClick={() => {}}
-              tasks={tasks}
-              onImport={setTasks}
-              isAdmin={isAdmin}
-            />
-            <TaskInput onAddTask={addTask} />
-          </div>
-          <TaskListSection
-            tasks={tasks}
-            onToggle={toggleTask}
-            onDelete={deleteTask}
-            onEdit={editTask}
-            onDuplicate={duplicateTask}
-            onReorder={reorderTasks}
-            onCheckAllSubTasks={checkAllSubTasks}
-            onImportTaskList={setTasks}
-            googleApiKey={settings.googleApiKey}
-            onError={setError}
-            isAdmin={isAdmin}
+      <div className="flex flex-1 min-h-0">
+        {/* Sidebar - always visible on desktop, hamburger on mobile */}
+        <div className="hidden md:flex h-full">
+          <SidebarV2
+            categories={categories}
+            onAddCategory={(name) => {}}
+            onSelectCategory={setSelectedCategoryId}
+            selectedCategoryId={selectedCategoryId}
+            days={days}
+            onSelectList={() => {}}
+            collapsed={sidebarCollapsed}
+            onCollapse={() => setSidebarCollapsed((prev) => !prev)}
+            onOpenHistory={() => setSelectedNav('history')}
+            today={today}
           />
         </div>
+        {/* Hamburger for mobile */}
+        <div className="md:hidden">
+          {/* Optionally render hamburger button here for mobile */}
+        </div>
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <HeaderNav
+            onSidebarToggle={() => setSidebarCollapsed((prev) => !prev)}
+            navLinks={[
+              { label: 'Dashboard', key: 'dashboard', active: selectedNav === 'dashboard', onClick: () => setSelectedNav('dashboard') },
+              { label: 'History', key: 'history', active: selectedNav === 'history', onClick: () => setSelectedNav('history') },
+              { label: 'Settings', key: 'settings', active: selectedNav === 'settings', onClick: () => setSelectedNav('settings') },
+            ]}
+          />
+        {/* Content switching based on selectedNav */}
+        <div className="flex-grow flex flex-col">
+          {selectedNav === 'dashboard' && (
+            <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 lg:px-8 w-full flex-grow">
+              <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 mb-8 transition-colors">
+                <Header
+                  onLogoClick={handleLogoClick}
+                  onSettingsClick={() => setShowSettingsModal(true)}
+                  onAdminClick={() => {}}
+                  tasks={tasks}
+                  onImport={setTasks}
+                  isAdmin={isAdmin}
+                />
+                <TaskInput onAddTask={addTask} />
+              </div>
+              <TaskListSection
+                tasks={tasks}
+                onToggle={toggleTask}
+                onDelete={deleteTask}
+                onEdit={editTask}
+                onDuplicate={duplicateTask}
+                onReorder={reorderTasks}
+                onCheckAllSubTasks={checkAllSubTasks}
+                onImportTaskList={setTasks}
+                googleApiKey={settings.googleApiKey}
+                onError={setError}
+                isAdmin={isAdmin}
+              />
+            </div>
+          )}
+          {selectedNav === 'history' && (
+            <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 lg:px-8 w-full flex-grow">
+              {/* TODO: Render history view here */}
+              <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 mb-8 transition-colors">
+                <h2 className="text-lg font-semibold mb-4">History</h2>
+                {/* Placeholder for history drawer or content */}
+              </div>
+            </div>
+          )}
+          {selectedNav === 'settings' && (
+            <div className="max-w-2xl mx-auto px-4 py-12 sm:px-6 lg:px-8 w-full flex-grow">
+              {/* TODO: Render settings view here */}
+              <div className="bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl shadow-sm p-4 sm:p-6 mb-8 transition-colors">
+                <h2 className="text-lg font-semibold mb-4">Settings</h2>
+                {/* Placeholder for settings modal or content */}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      <Footer />
-      <button
-        onClick={() => setShowHelpModal(true)}
-        className="fixed bottom-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white"
-        title="Help"
-      >
-        <HelpCircle size={24} />
-      </button>
-      {showConfirmationModal && (
-        <ConfirmationModal
-          onConfirm={handleConfirmReload}
-          onCancel={() => setShowConfirmationModal(false)}
-          tasks={tasks}
-        />
-      )}
-      {showSettingsModal && (
-        <SettingsModal
-          onClose={() => setShowSettingsModal(false)}
-          onSave={handleSettingsSave}
-          initialSettings={settings}
-          isAdmin={isAdmin}
-          user={user}
-          onShowAuth={() => setShowAuthModal(true)}
-        />
-      )}
-      {showHelpModal && (
-        <HelpModal onClose={() => setShowHelpModal(false)} />
-      )}
-      {showTour && (
-        <Tour onComplete={handleTourComplete} />
-      )}
-      {showAuthModal && (
-        <AuthModal
-          onClose={() => setShowAuthModal(false)}
-          isFirstUser={isFirstUser}
-        />
-      )}
     </div>
+    {error && <ErrorNotification message={error} onClose={() => setError(null)} />}
+    <Footer />
+    <button
+      onClick={() => setShowHelpModal(true)}
+      className="fixed bottom-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-white"
+      title="Help"
+    >
+      <HelpCircle size={24} />
+    </button>
+    {showConfirmationModal && (
+      <ConfirmationModal
+        onConfirm={handleConfirmReload}
+        onCancel={() => setShowConfirmationModal(false)}
+        tasks={tasks}
+      />
+    )}
+    {showSettingsModal && (
+      <SettingsModal
+        onClose={() => setShowSettingsModal(false)}
+        onSave={handleSettingsSave}
+        initialSettings={settings}
+        isAdmin={isAdmin}
+        user={user}
+        onShowAuth={() => setShowAuthModal(true)}
+      />
+    )}
+    {showHelpModal && (
+      <HelpModal onClose={() => setShowHelpModal(false)} />
+    )}
+    {showTour && (
+      <Tour onComplete={handleTourComplete} />
+    )}
+    {showAuthModal && (
+      <AuthModal
+        onClose={() => setShowAuthModal(false)}
+        isFirstUser={isFirstUser}
+      />
+    )}
+  </div>
   );
 }
