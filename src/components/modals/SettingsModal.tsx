@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, ExternalLink, LogIn, LogOut } from 'lucide-react';
-import { ChatHistory } from '../ChatHistory';
-import { ImportExamplesButton } from '../admin/ImportExamplesButton';
+import { ChatHistory } from '../ai/ChatHistory';
+import { ImportExamplesButton } from '../ImportExamplesButton';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 

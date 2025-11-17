@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Save } from 'lucide-react';
-import { SaveListModal } from './SaveListModal';
+import { SaveListModal } from '../modals/SaveListModal';
 
 interface SaveListButtonProps {
   onSave: (name: string, asExample: boolean) => Promise<boolean>;

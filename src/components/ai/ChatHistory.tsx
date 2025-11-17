@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Download, ChevronRight, Trash2, X } from 'lucide-react';
-import { ChatMessage } from '../types/chat';
+import { ChatMessage } from '../../types/chat';
 
 interface ChatHistoryProps {
   onClose: () => void;

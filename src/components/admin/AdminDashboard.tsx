@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getTaskLists, deleteTaskList, TaskList } from '../../services/taskListService';
 import { Edit2, Trash2, Plus, ArrowLeft } from 'lucide-react';
-import { ListEditor } from './ListEditor';
+import { ListEditor } from '../task/ListEditor';
+
 
 interface AdminDashboardProps {
   onClose: () => void;
   onError: (error: string) => void;
+  onEditList: (list: TaskList) => void;
 }
 
 export function AdminDashboard({ onClose, onError }: AdminDashboardProps) {

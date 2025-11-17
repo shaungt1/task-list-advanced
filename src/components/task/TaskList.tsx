@@ -1,4 +1,4 @@
-import React from 'react';
+// import { useState } from 'react';
 import {
   DndContext,
   DragEndEvent,
@@ -12,7 +12,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Task } from '../types/task';
+import { Task } from '../../types/task';
 import { DraggableTaskItem } from './DraggableTaskItem';
 
 interface TaskListProps {
