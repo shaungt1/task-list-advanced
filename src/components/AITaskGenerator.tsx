@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { Send, Paperclip } from 'lucide-react';
-import { generateTasks } from '../services/aiService';
+import { generateTasks as generateGeminiTasks } from '../services/aiService';
+import { generateTasks as generateOpenAITasks } from '../services/openaiService';
 import { ChatMessage } from '../types/chat';
 
 interface AITaskGeneratorProps {
-  apiKey: string;
+  settings: {
+    aiProvider: string;
+    googleApiKey: string;
+    openaiApiKey: string;
+  };
   onTasksGenerated: (tasks: any[]) => void;
   onError: (error: string) => void;
 }
 
-export function AITaskGenerator({ apiKey, onTasksGenerated, onError }: AITaskGeneratorProps) {
+export function AITaskGenerator({ settings, onTasksGenerated, onError }: AITaskGeneratorProps) {
   const [chatInput, setChatInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -51,10 +56,18 @@ export function AITaskGenerator({ apiKey, onTasksGenerated, onError }: AITaskGen
         fileContent = await selectedFile.text();
       }
 
-      const data = await generateTasks(apiKey, chatInput, fileContent);
-      
-      if (data.candidates?.[0]?.content?.parts?.[0]) {
-        const generatedText = data.candidates[0].content.parts[0].text;
+      // Call the appropriate service based on AI provider
+      const apiKey = settings.aiProvider === 'openai' ? settings.openaiApiKey : settings.googleApiKey;
+      const data = settings.aiProvider === 'openai'
+        ? await generateOpenAITasks(apiKey, chatInput, fileContent)
+        : await generateGeminiTasks(apiKey, chatInput, fileContent);
+
+      // Handle different response formats
+      const generatedText = settings.aiProvider === 'openai'
+        ? data.choices?.[0]?.message?.content
+        : data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+      if (generatedText) {
         console.log('Generated text:', generatedText);
         
         // Add assistant response to history right after getting the response

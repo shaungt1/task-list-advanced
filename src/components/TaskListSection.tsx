@@ -14,7 +14,11 @@ interface TaskListSectionProps {
   onReorder: (tasks: Task[]) => void;
   onCheckAllSubTasks: (headlineId: string) => void;
   onImportTaskList: (tasks: Task[]) => void;
-  googleApiKey?: string;
+  settings: {
+    aiProvider: string;
+    googleApiKey: string;
+    openaiApiKey: string;
+  };
   onError: (error: string) => void;
   isAdmin: boolean;
   selectedTaskId?: string | null;
@@ -30,7 +34,7 @@ export function TaskListSection({
   onReorder,
   onCheckAllSubTasks,
   onImportTaskList,
-  googleApiKey,
+  settings,
   onError,
   isAdmin,
   selectedTaskId,
@@ -87,15 +91,15 @@ export function TaskListSection({
           <TaskListSelector
             exampleLists={exampleLists}
           />
-          {googleApiKey ? (
+          {(settings.googleApiKey || settings.openaiApiKey) ? (
             <AITaskGenerator
-              apiKey={googleApiKey}
+              settings={settings}
               onTasksGenerated={onImportTaskList}
               onError={onError}
             />
           ) : (
             <p className="ai-config-text text-gray-600 text-center mt-4">
-              Configure your Google API key in settings to use AI task generation
+              Configure your AI provider and API key in settings to use AI task generation
             </p>
           )}
         </>

@@ -253,7 +253,11 @@ export default function App() {
           onReorder={reorderTasks}
           onCheckAllSubTasks={checkAllSubTasks}
           onImportTaskList={setTasks}
-          googleApiKey={settings.googleApiKey}
+          settings={{
+            aiProvider: settings.aiProvider,
+            googleApiKey: settings.googleApiKey,
+            openaiApiKey: settings.openaiApiKey
+          }}
           onError={setError}
           isAdmin={isAdmin}
           selectedTaskId={selectedTaskId}

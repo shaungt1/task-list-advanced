@@ -41,20 +41,21 @@ Examples of task lists you might generate:
 - Travel planning (bookings + packing)
 - Any other structured task list`;
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+  const userPrompt = `Create a task list for: ${prompt}${fileContent ? `\n\nUse this additional context:\n${fileContent}` : ''}`;
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
+      'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      contents: [{
-        parts: [
-          { text: systemPrompt },
-          { text: `\n\nCreate a task list for: ${prompt}` },
-          ...(fileContent ? [{ text: `\n\nUse this additional context:\n${fileContent}` }] : []),
-          { text: "\n\nRespond ONLY with the JSON, no additional text or markdown formatting." }
-        ]
-      }]
+      model: 'gpt-4o-mini',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      response_format: { type: 'json_object' }
     }),
   });
 
@@ -63,5 +64,14 @@ Examples of task lists you might generate:
     throw new Error(`Failed to generate content: ${response.statusText} - ${errorData.error?.message || 'No details provided'}`);
   }
 
-  return response.json();
-} 
+  const data = await response.json();
+
+  // Transform OpenAI response to match Gemini format for compatibility
+  return {
+    choices: [{
+      message: {
+        content: data.choices[0].message.content
+      }
+    }]
+  };
+}

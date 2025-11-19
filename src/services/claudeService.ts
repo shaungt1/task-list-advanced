@@ -39,22 +39,26 @@ Examples of task lists you might generate:
 - Daily routines (habits + goals)
 - Recipe preparation (ingredients + steps)
 - Travel planning (bookings + packing)
-- Any other structured task list`;
+- Any other structured task list
 
-  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`, {
+Respond ONLY with valid JSON matching the structure above. Do not include any markdown formatting or additional text.`;
+
+  const userPrompt = `Create a task list for: ${prompt}${fileContent ? `\n\nUse this additional context:\n${fileContent}` : ''}`;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: {
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      contents: [{
-        parts: [
-          { text: systemPrompt },
-          { text: `\n\nCreate a task list for: ${prompt}` },
-          ...(fileContent ? [{ text: `\n\nUse this additional context:\n${fileContent}` }] : []),
-          { text: "\n\nRespond ONLY with the JSON, no additional text or markdown formatting." }
-        ]
-      }]
+      model: 'claude-3-5-sonnet-20241022',
+      max_tokens: 4096,
+      system: systemPrompt,
+      messages: [
+        { role: 'user', content: userPrompt }
+      ]
     }),
   });
 
@@ -63,5 +67,12 @@ Examples of task lists you might generate:
     throw new Error(`Failed to generate content: ${response.statusText} - ${errorData.error?.message || 'No details provided'}`);
   }
 
-  return response.json();
-} 
+  const data = await response.json();
+
+  // Transform Claude response to match expected format
+  return {
+    content: [{
+      text: data.content[0].text
+    }]
+  };
+}

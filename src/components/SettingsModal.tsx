@@ -11,11 +11,15 @@ interface SettingsModalProps {
     service: string;
     model: string;
     googleApiKey: string;
+    aiProvider: string;
+    openaiApiKey: string;
   }) => void;
   initialSettings: {
     service: string;
     model: string;
     googleApiKey: string;
+    aiProvider: string;
+    openaiApiKey: string;
   };
   isAdmin?: boolean;
   user: User | null;
@@ -101,29 +105,69 @@ export function SettingsModal({ onClose, onSave, initialSettings, isAdmin, user,
               </div>
             </div>
 
-            {/* Google API Key Section */}
+            {/* AI Provider Section */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google API Key
+                AI Provider
               </label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="password"
-                  value={settings.googleApiKey || ''}
-                  onChange={(e) => setSettings({ ...settings, googleApiKey: e.target.value })}
-                  className="flex-1 px-3 py-2 border rounded-md"
-                  placeholder="Enter your API key"
-                />
-                <button
-                  onClick={() => window.open('https://makersuite.google.com/app/apikey', '_blank')}
-                  className="modern-button bg-yellow-100 text-yellow-700 hover:bg-yellow-200 whitespace-nowrap w-fit flex items-center gap-1"
-                  title="Get Google API Key"
-                >
-                  Get API Key
-                  <ExternalLink size={14} />
-                </button>
-              </div>
+              <select
+                value={settings.aiProvider || 'gemini'}
+                onChange={(e) => setSettings({ ...settings, aiProvider: e.target.value })}
+                className="w-full px-3 py-2 border rounded-md"
+              >
+                <option value="gemini">Google Gemini</option>
+                <option value="openai">OpenAI</option>
+              </select>
             </div>
+
+            {/* Conditional API Key Inputs */}
+            {settings.aiProvider === 'openai' ? (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  OpenAI API Key
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="password"
+                    value={settings.openaiApiKey || ''}
+                    onChange={(e) => setSettings({ ...settings, openaiApiKey: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md"
+                    placeholder="Enter your OpenAI API key"
+                  />
+                  <button
+                    onClick={() => window.open('https://platform.openai.com/api-keys', '_blank')}
+                    className="modern-button bg-yellow-100 text-yellow-700 hover:bg-yellow-200 whitespace-nowrap w-fit flex items-center gap-1"
+                    title="Get OpenAI API Key"
+                  >
+                    Get API Key
+                    <ExternalLink size={14} />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Google API Key
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="password"
+                    value={settings.googleApiKey || ''}
+                    onChange={(e) => setSettings({ ...settings, googleApiKey: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md"
+                    placeholder="Enter your Google API key"
+                  />
+                  <button
+                    onClick={() => window.open('https://makersuite.google.com/app/apikey', '_blank')}
+                    className="modern-button bg-yellow-100 text-yellow-700 hover:bg-yellow-200 whitespace-nowrap w-fit flex items-center gap-1"
+                    title="Get Google API Key"
+                  >
+                    Get API Key
+                    <ExternalLink size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Admin Section */}
             {isAdmin && (
