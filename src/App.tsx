@@ -256,7 +256,9 @@ export default function App() {
           settings={{
             aiProvider: settings.aiProvider,
             googleApiKey: settings.googleApiKey,
-            openaiApiKey: settings.openaiApiKey
+            openaiApiKey: settings.openaiApiKey,
+            claudeApiKey: settings.claudeApiKey,
+            grokApiKey: settings.grokApiKey
           }}
           onError={setError}
           isAdmin={isAdmin}

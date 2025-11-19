@@ -13,6 +13,8 @@ interface SettingsModalProps {
     googleApiKey: string;
     aiProvider: string;
     openaiApiKey: string;
+    claudeApiKey: string;
+    grokApiKey: string;
   }) => void;
   initialSettings: {
     service: string;
@@ -20,6 +22,8 @@ interface SettingsModalProps {
     googleApiKey: string;
     aiProvider: string;
     openaiApiKey: string;
+    claudeApiKey: string;
+    grokApiKey: string;
   };
   isAdmin?: boolean;
   user: User | null;
@@ -117,6 +121,8 @@ export function SettingsModal({ onClose, onSave, initialSettings, isAdmin, user,
               >
                 <option value="gemini">Google Gemini</option>
                 <option value="openai">OpenAI</option>
+                <option value="claude">Anthropic Claude</option>
+                <option value="grok">xAI Grok</option>
               </select>
             </div>
 
@@ -138,6 +144,52 @@ export function SettingsModal({ onClose, onSave, initialSettings, isAdmin, user,
                     onClick={() => window.open('https://platform.openai.com/api-keys', '_blank')}
                     className="modern-button bg-yellow-100 text-yellow-700 hover:bg-yellow-200 whitespace-nowrap w-fit flex items-center gap-1"
                     title="Get OpenAI API Key"
+                  >
+                    Get API Key
+                    <ExternalLink size={14} />
+                  </button>
+                </div>
+              </div>
+            ) : settings.aiProvider === 'claude' ? (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Anthropic Claude API Key
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="password"
+                    value={settings.claudeApiKey || ''}
+                    onChange={(e) => setSettings({ ...settings, claudeApiKey: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md"
+                    placeholder="Enter your Claude API key"
+                  />
+                  <button
+                    onClick={() => window.open('https://console.anthropic.com/settings/keys', '_blank')}
+                    className="modern-button bg-yellow-100 text-yellow-700 hover:bg-yellow-200 whitespace-nowrap w-fit flex items-center gap-1"
+                    title="Get Claude API Key"
+                  >
+                    Get API Key
+                    <ExternalLink size={14} />
+                  </button>
+                </div>
+              </div>
+            ) : settings.aiProvider === 'grok' ? (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  xAI Grok API Key
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="password"
+                    value={settings.grokApiKey || ''}
+                    onChange={(e) => setSettings({ ...settings, grokApiKey: e.target.value })}
+                    className="flex-1 px-3 py-2 border rounded-md"
+                    placeholder="Enter your Grok API key"
+                  />
+                  <button
+                    onClick={() => window.open('https://console.x.ai/', '_blank')}
+                    className="modern-button bg-yellow-100 text-yellow-700 hover:bg-yellow-200 whitespace-nowrap w-fit flex items-center gap-1"
+                    title="Get Grok API Key"
                   >
                     Get API Key
                     <ExternalLink size={14} />

@@ -18,6 +18,8 @@ interface TaskListSectionProps {
     aiProvider: string;
     googleApiKey: string;
     openaiApiKey: string;
+    claudeApiKey: string;
+    grokApiKey: string;
   };
   onError: (error: string) => void;
   isAdmin: boolean;
@@ -91,7 +93,7 @@ export function TaskListSection({
           <TaskListSelector
             exampleLists={exampleLists}
           />
-          {(settings.googleApiKey || settings.openaiApiKey) ? (
+          {(settings.googleApiKey || settings.openaiApiKey || settings.claudeApiKey || settings.grokApiKey) ? (
             <AITaskGenerator
               settings={settings}
               onTasksGenerated={onImportTaskList}

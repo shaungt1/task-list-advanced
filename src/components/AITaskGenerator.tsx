@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Send, Paperclip } from 'lucide-react';
-import { generateTasks as generateGeminiTasks } from '../services/aiService';
-import { generateTasks as generateOpenAITasks } from '../services/openaiService';
+import { runAgent } from '../agents/workflow';
 import { ChatMessage } from '../types/chat';
+import { TaskListOutput } from '../types/agent';
 
 interface AITaskGeneratorProps {
   settings: {
     aiProvider: string;
     googleApiKey: string;
     openaiApiKey: string;
+    claudeApiKey: string;
+    grokApiKey: string;
   };
   onTasksGenerated: (tasks: any[]) => void;
   onError: (error: string) => void;
@@ -56,58 +58,54 @@ export function AITaskGenerator({ settings, onTasksGenerated, onError }: AITaskG
         fileContent = await selectedFile.text();
       }
 
-      // Call the appropriate service based on AI provider
-      const apiKey = settings.aiProvider === 'openai' ? settings.openaiApiKey : settings.googleApiKey;
-      const data = settings.aiProvider === 'openai'
-        ? await generateOpenAITasks(apiKey, chatInput, fileContent)
-        : await generateGeminiTasks(apiKey, chatInput, fileContent);
+      // Execute agent workflow
+      const result = await runAgent(chatInput, settings, fileContent);
 
-      // Handle different response formats
-      const generatedText = settings.aiProvider === 'openai'
-        ? data.choices?.[0]?.message?.content
-        : data.candidates?.[0]?.content?.parts?.[0]?.text;
+      // Log response for chat history
+      const responseContent = result.responseText || JSON.stringify(result.data);
+      addToChatHistory({
+        role: 'assistant',
+        content: responseContent,
+        timestamp: Date.now()
+      });
 
-      if (generatedText) {
-        console.log('Generated text:', generatedText);
-        
-        // Add assistant response to history right after getting the response
-        addToChatHistory({
-          role: 'assistant',
-          content: generatedText,
-          timestamp: Date.now()
-        });
+      // Handle result based on agent type
+      if (result.agentType === 'task_list') {
+        // Task list agent - display tasks in UI
+        const taskList = result.data as TaskListOutput;
+        onTasksGenerated(taskList.data);
+        setChatInput('');
+        setSelectedFile(null);
+        setSelectedFileName(null);
 
-        const jsonMatch = generatedText.match(/```json\n?(.*?)\n?```/s) || [null, generatedText];
-        const jsonText = jsonMatch[1].trim();
-        console.log('Extracted JSON:', jsonText);
-
-        try {
-          const parsedData = JSON.parse(jsonText);
-          console.log('Parsed data:', parsedData);
-          
-          if (parsedData?.data) {
-            const newTasks = parsedData.data.map((task: any) => ({
-              ...task,
-              createdAt: new Date(task.createdAt || new Date()),
-              id: task.id || crypto.randomUUID()
-            }));
-            onTasksGenerated(newTasks);
-            setChatInput('');
-            setSelectedFile(null);
-            setSelectedFileName(null);
-          } else {
-            throw new Error('Invalid task list format');
-          }
-        } catch (parseError) {
-          console.error('Parse error:', parseError);
-          onError('Failed to parse generated tasks. Invalid format.');
+      } else if (result.agentType === 'daily_notes') {
+        // Daily notes agent - show confirmation
+        if (result.voiceResponse && result.responseText) {
+          alert(result.responseText); // Temporary - will be TTS later
         }
+        setChatInput('');
+
+      } else if (result.agentType === 'calendar_events') {
+        // Calendar events agent - show confirmation
+        if (result.voiceResponse && result.responseText) {
+          alert(result.responseText); // Temporary - will be TTS later
+        }
+        setChatInput('');
+
+      } else if (result.agentType === 'function_call') {
+        // Function call agent - show confirmation if not muted
+        if (result.voiceResponse && result.responseText) {
+          alert(result.responseText); // Temporary - will be TTS later
+        }
+        setChatInput('');
+
       } else {
-        throw new Error('Invalid AI response format');
+        throw new Error(`Unknown agent type: ${result.agentType}`);
       }
+
     } catch (error: any) {
-      console.error('Generation error:', error);
-      onError(error.message || 'Failed to generate tasks');
+      console.error('Agent error:', error);
+      onError(error.message || 'Failed to process request');
     } finally {
       setLoading(false);
     }
