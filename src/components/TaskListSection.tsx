@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Task } from '../types/task';
 import { TaskList } from './TaskList';
 import { TaskListSelector } from './TaskListSelector';
-import { AITaskGenerator } from './AITaskGenerator';
+import { AITaskGenerator } from './ai-service/AITaskGenerator';
 import { getExampleLists } from '../services/taskListService';
 
 interface TaskListSectionProps {

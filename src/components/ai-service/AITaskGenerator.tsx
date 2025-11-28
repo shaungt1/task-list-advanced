@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Send, Paperclip } from 'lucide-react';
-import { runAgent } from '../agents/workflow';
-import { ChatMessage } from '../types/chat';
-import { TaskListOutput } from '../types/agent';
+import { runAgent } from '../../agents/workflow';
+import { ChatMessage } from '../../types/chat';
+import { TaskListOutput } from '../../types/agent';
 
 interface AITaskGeneratorProps {
   settings: {
