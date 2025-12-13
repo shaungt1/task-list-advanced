@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X } from 'lucide-react';
+import { toast } from 'sonner';
 import { supabase } from '../../lib/supabase';
+import { authLogger } from '../../utils/logger';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -26,11 +28,13 @@ export function AuthModal({ onClose, isFirstUser }: AuthModalProps) {
     e.preventDefault();
     if (!email.trim()) {
       setError('Please enter your email address');
+      toast.error('Please enter your email address');
       return;
     }
 
     setLoading(true);
     setError(null);
+    authLogger.info('Password reset requested', { email: email.trim() });
 
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(
@@ -41,14 +45,19 @@ export function AuthModal({ onClose, isFirstUser }: AuthModalProps) {
       );
 
       if (resetError) {
+        authLogger.error('Password reset failed', { error: resetError.message });
         setError(resetError.message);
+        toast.error(`Password reset failed: ${resetError.message}`);
         return;
       }
 
+      authLogger.info('Password reset email sent', { email: email.trim() });
+      toast.success('Password reset email sent! Check your inbox.');
       setResetEmailSent(true);
     } catch (err: any) {
-      console.error('Password reset error:', err);
+      authLogger.error('Password reset unexpected error', { error: err });
       setError('An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -58,6 +67,7 @@ export function AuthModal({ onClose, isFirstUser }: AuthModalProps) {
     e.preventDefault();
     if (!email.trim() || !password.trim()) {
       setError('Please enter both email and password');
+      toast.error('Please enter both email and password');
       return;
     }
 
@@ -67,6 +77,8 @@ export function AuthModal({ onClose, isFirstUser }: AuthModalProps) {
     try {
       if (isSignUp) {
         // Sign up
+        authLogger.info('Sign up attempt', { email: email.trim(), isFirstUser });
+
         const { data, error: signUpError } = await supabase.auth.signUp({
           email: email.trim(),
           password: password.trim(),
@@ -76,40 +88,97 @@ export function AuthModal({ onClose, isFirstUser }: AuthModalProps) {
         });
 
         if (signUpError) {
+          authLogger.error('Sign up failed', { error: signUpError.message, code: signUpError.status });
           if (signUpError.message.includes('already registered')) {
             setError('This email is already registered. Please sign in instead.');
+            toast.error('Email already registered. Please sign in instead.');
           } else {
             setError(signUpError.message);
+            toast.error(`Sign up failed: ${signUpError.message}`);
           }
           return;
         }
 
         if (!data.user) {
+          authLogger.error('Sign up failed - no user returned');
           setError('Failed to create account. Please try again.');
+          toast.error('Failed to create account. Please try again.');
           return;
         }
 
+        // Check if email confirmation is required
+        // When email verification is enabled, identities will be empty until confirmed
+        const needsEmailVerification = data.user.identities?.length === 0 ||
+          (data.session === null && data.user.email_confirmed_at === null);
+
+        if (needsEmailVerification) {
+          authLogger.info('Sign up successful - email verification required', {
+            userId: data.user.id,
+            email: data.user.email
+          });
+
+          toast.info(
+            'Account created! Please check your email to verify your account before signing in.',
+            { duration: 8000 }
+          );
+
+          setError('Please check your email to verify your account. Then you can sign in.');
+          setIsSignUp(false); // Switch to sign-in mode
+          return;
+        }
+
+        // Success - no email verification needed!
+        authLogger.info('Sign up successful', {
+          userId: data.user.id,
+          email: data.user.email,
+          role: isFirstUser ? 'admin' : 'user'
+        });
+
+        toast.success(
+          isFirstUser
+            ? 'Admin account created successfully! You are now logged in.'
+            : 'Account created successfully! You are now logged in.',
+          { duration: 5000 }
+        );
+
       } else {
         // Sign in
-        const { error: signInError } = await supabase.auth.signInWithPassword({
+        authLogger.info('Sign in attempt', { email: email.trim() });
+
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password: password.trim()
         });
 
         if (signInError) {
-          if (signInError.message.includes('Invalid login credentials')) {
+          authLogger.error('Sign in failed', { error: signInError.message, code: signInError.status });
+
+          if (signInError.message.includes('Email not confirmed')) {
+            setError('Please verify your email before signing in. Check your inbox for the verification link.');
+            toast.warning('Email not verified. Please check your inbox for the verification link.', { duration: 6000 });
+          } else if (signInError.message.includes('Invalid login credentials')) {
             setError('Invalid email or password. Please try again.');
+            toast.error('Invalid email or password. Please try again.');
           } else {
             setError(signInError.message);
+            toast.error(`Sign in failed: ${signInError.message}`);
           }
           return;
         }
+
+        // Success!
+        authLogger.info('Sign in successful', {
+          userId: data.user?.id,
+          email: data.user?.email
+        });
+        toast.success('Signed in successfully!');
       }
 
       onClose();
     } catch (err: any) {
-      console.error('Auth error:', err);
+      authLogger.error('Auth unexpected error', { error: err });
       setError('An unexpected error occurred. Please try again.');
+      toast.error('An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
     }

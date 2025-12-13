@@ -1,5 +1,29 @@
 # Supabase Setup Guide
 
+## Quick Links
+
+- **Supabase Dashboard**: https://supabase.com/dashboard/project/xmdtgiolsbkvjsywpgco
+- **Project URL**: https://xmdtgiolsbkvjsywpgco.supabase.co
+
+## Troubleshooting Common Issues
+
+### Project Paused
+Free tier Supabase projects are paused after 7 days of inactivity.
+- Go to your [Supabase Dashboard](https://supabase.com/dashboard/project/xmdtgiolsbkvjsywpgco)
+- Click "Restore project" if paused
+- Wait 1-2 minutes for it to fully resume
+
+### "Failed to fetch" Error
+1. Check if project is paused (see above)
+2. Restart your dev server after unpausing
+3. Clear browser cache if issues persist
+
+### "ERR_NAME_NOT_RESOLVED"
+- Project URL is wrong or project doesn't exist
+- Verify URL in `.env` matches your Supabase project
+
+---
+
 ## Creating a New Supabase Project
 
 1. **Go to [Supabase](https://supabase.com)** and sign in or create an account
@@ -153,9 +177,22 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
 
 ### Authentication not working
 - Check that email confirmations are disabled in Supabase:
-  - Go to Authentication → Settings → Email Auth
-  - Disable "Confirm email" for development
+  - Go to Authentication → Providers → Email
+  - **Disable "Confirm email"** for development
   - Or check your email for confirmation links
+
+### Disable Email Verification (Recommended for Development)
+
+To skip email verification during development:
+
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard/project/xmdtgiolsbkvjsywpgco)
+2. Click **Authentication** in the left sidebar
+3. Click **Providers** tab
+4. Click on **Email** provider
+5. **Toggle OFF** "Confirm email"
+6. Click **Save**
+
+Now users can sign up and be immediately logged in without email verification.
 
 ### Password reset not working
 - Emails may go to spam folder

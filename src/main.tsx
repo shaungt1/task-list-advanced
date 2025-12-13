@@ -1,12 +1,25 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'sonner';
 import App from './App.tsx';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
+      <Toaster
+        position="top-right"
+        richColors
+        closeButton
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: 'white',
+            border: '1px solid #e5e7eb',
+          },
+        }}
+      />
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/list/:listName" element={<App />} />
