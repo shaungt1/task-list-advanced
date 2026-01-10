@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, ExternalLink, LogIn, LogOut } from 'lucide-react';
+import { X, ExternalLink, LogIn, LogOut, ChevronDown, ChevronUp, Settings2 } from 'lucide-react';
 import { ChatHistory } from './ChatHistory';
 import { ImportExamplesButton } from './admin/ImportExamplesButton';
+import { AccountSettings, supabase } from '../auth';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '../lib/supabase';
 
 interface SettingsModalProps {
   onClose: () => void;
@@ -33,6 +33,7 @@ interface SettingsModalProps {
 export function SettingsModal({ onClose, onSave, initialSettings, isAdmin, user, onShowAuth }: SettingsModalProps) {
   const [settings, setSettings] = useState(initialSettings);
   const [clearing, setClearing] = useState(false);
+  const [showAccountSettings, setShowAccountSettings] = useState(false);
 
   const clearSiteData = async () => {
     setClearing(true);
@@ -84,29 +85,60 @@ export function SettingsModal({ onClose, onSave, initialSettings, isAdmin, user,
             
             {/* Authentication Section */}
             <div className="mb-6 pb-6 border-b">
-              <div className="flex items-center justify-between">
-                <h4 className="text-sm font-medium text-gray-900">Account</h4>
-                {user ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">{user.email}</span>
-                    <button
-                      onClick={handleSignOut}
-                      className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:text-red-700"
-                    >
-                      <LogOut size={16} />
-                      Sign Out
-                    </button>
-                  </div>
-                ) : (
+              {user ? (
+                <div>
+                  <button
+                    onClick={() => setShowAccountSettings(!showAccountSettings)}
+                    className="w-full flex items-center justify-between p-2 -mx-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Settings2 size={16} className="text-violet-600" />
+                      <h4 className="text-sm font-medium text-gray-900">Account Settings</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 truncate max-w-[150px]">{user.email}</span>
+                      {showAccountSettings ? (
+                        <ChevronUp size={16} className="text-gray-400" />
+                      ) : (
+                        <ChevronDown size={16} className="text-gray-400" />
+                      )}
+                    </div>
+                  </button>
+
+                  {showAccountSettings && (
+                    <div className="mt-4 pt-4 border-t">
+                      <AccountSettings
+                        user={user}
+                        onClose={onClose}
+                        isAdmin={isAdmin}
+                      />
+                    </div>
+                  )}
+
+                  {!showAccountSettings && (
+                    <div className="mt-2 flex justify-end">
+                      <button
+                        onClick={handleSignOut}
+                        className="flex items-center gap-1 px-3 py-1 text-sm text-red-600 hover:text-red-700"
+                      >
+                        <LogOut size={16} />
+                        Sign Out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-900">Account</h4>
                   <button
                     onClick={onShowAuth}
-                    className="flex items-center gap-1 px-3 py-1 text-sm text-blue-600 hover:text-blue-700"
+                    className="flex items-center gap-1 px-3 py-1.5 text-sm bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white rounded-md hover:from-violet-700 hover:to-fuchsia-700 transition-colors"
                   >
                     <LogIn size={16} />
                     Sign In
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
             {/* AI Provider Section */}

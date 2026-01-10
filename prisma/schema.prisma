@@ -1,0 +1,71 @@
+// Prisma Schema for Task List Advanced
+// Matches Supabase database structure
+//
+// To connect to Supabase, update DATABASE_URL in .env:
+// Direct connection: postgresql://postgres:[PASSWORD]@db.xmdtgiolsbkvjsywpgco.supabase.co:5432/postgres
+// Pooled connection: postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true
+//
+// Run: npx prisma generate
+// Run: npx prisma db pull (to sync with existing Supabase tables)
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Optional: for migrations when using pooled connection
+}
+
+// =============================================================================
+// User Model
+// Matches the 'users' table in Supabase (synced with auth.users via trigger)
+// =============================================================================
+model User {
+  id        String   @id @default(uuid()) @db.Uuid
+  email     String
+  role      String   @default("user") // 'admin' or 'user'
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  // Relations
+  taskLists TaskList[]
+
+  @@map("users")
+}
+
+// =============================================================================
+// TaskList Model
+// Matches the 'task_lists' table in Supabase
+// =============================================================================
+model TaskList {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  data      Json     // JSONB column storing Task[] array
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  userId    String?  @map("user_id") @db.Uuid
+  isExample Boolean  @default(false) @map("is_example")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("task_lists")
+}
+
+// =============================================================================
+// Task Type Definition (for reference - stored as JSON in TaskList.data)
+// =============================================================================
+// interface Task {
+//   id: string;
+//   text: string;
+//   completed: boolean;
+//   createdAt: Date;
+//   isHeadline?: boolean;
+//   codeBlock?: {
+//     language: string;
+//     code: string;
+//   };
+//   richText?: string;
+//   optional?: boolean;
+// }

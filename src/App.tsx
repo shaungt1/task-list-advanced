@@ -4,7 +4,7 @@ import { HelpCircle } from 'lucide-react';
 import { useSettings } from './hooks/useSettings';
 import { getExampleLists, getTaskLists } from './services/taskListService';
 import { useTasks } from './hooks/useTasks';
-import { useAuth } from './hooks/useAuth';
+import { useAuth, AuthModal, supabase } from './auth';
 import { Header } from './components/Header';
 import { TaskInput } from './components/TaskInput';
 import { TaskListSection } from './components/TaskListSection';
@@ -15,9 +15,7 @@ import { HelpModal } from './components/HelpModal';
 import { ErrorNotification } from './components/ErrorNotification';
 import { IntroModal } from './components/IntroModal';
 import { Tour } from './components/tour/Tour';
-import { AuthModal } from './components/auth/AuthModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
-import { supabase } from './lib/supabase';
 
 export default function App() {
   const [settings, setSettings] = useSettings();

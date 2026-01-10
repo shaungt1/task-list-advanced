@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import App from './App.tsx';
+import { ResetPassword, AuthCallback } from './auth';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
@@ -25,6 +26,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/list/:listName" element={<App />} />
         <Route path="/admin" element={<App />} />
         <Route path="/admin/list/:listName" element={<App />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

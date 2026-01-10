@@ -1,4 +1,4 @@
-import { supabase } from '../lib/supabase';
+import { supabase } from '../auth';
 import { Task } from '../types/task';
 
 export interface TaskList {
